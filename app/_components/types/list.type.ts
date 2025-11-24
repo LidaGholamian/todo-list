@@ -1,6 +1,7 @@
-export type Todo = {
+export type TodoProps = {
     id: number,
     title: string,
     completed: boolean,
-    date: string
+    date: string,
+    favIcon?: boolean;
 }

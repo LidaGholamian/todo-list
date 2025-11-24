@@ -1,53 +1,37 @@
 "use client";
-
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useReducer,
-  useState,
-} from "react";
-import { Todo } from "../_components/types/list.type";
+import { createContext, useContext, useReducer, useEffect } from "react";
 import { TodoAction, TodoState } from "../types/todoContext.type";
+import { TodoProps } from "../_components/types/list.type";
 
-const initialState: TodoState = {
-  todos: [],
-};
 
-// reducer function
+const initialState: TodoState = { todos: [] };
+
 const todoReducer = (state: TodoState, action: TodoAction): TodoState => {
   switch (action.type) {
     case "ADD_TASK":
-      const addTodo: Todo = {
+      const newTodo: TodoProps = {
         id: Date.now(),
-        title: action.payload.title, // Get title from payload
+        title: action.payload.title,
         completed: false,
-        date: action.payload.date || new Date().toISOString(), // Get date from payload
+        date: action.payload.date || new Date().toISOString(),
+        favIcon: action.payload.favIcon || false,
       };
-      return { todos: [...state.todos, addTodo] };
-
+      return { todos: [...state.todos, newTodo] };
     case "DELETE_TASK":
-      return {
-        todos: state.todos.filter((todo) => todo.id !== action.payload),
-      };
+      return { todos: state.todos.filter((t) => t.id !== action.payload) };
     case "TOGGLE_TASK":
       return {
-        todos: state.todos.map((todo) =>
-          todo.id === action.payload
-            ? { ...todo, completed: !todo.completed }
-            : todo
+        todos: state.todos.map((t) =>
+          t.id === action.payload ? { ...t, completed: !t.completed } : t
         ),
       };
-
-    case "REORDER_TASKS":
-      return { ...state, todos: action.payload };
-
+    case "INITIALIZE_TASKS":
+      return { todos: action.payload };
     default:
       return state;
   }
 };
 
-// create context
 const TodoContext = createContext<{
   state: TodoState;
   dispatch: React.Dispatch<TodoAction>;
@@ -56,47 +40,18 @@ const TodoContext = createContext<{
 export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [isClient, setIsClient] = useState(false);
-
-  const [state, dispatch] = useReducer(
-    todoReducer,
-    initialState,
-    (initialState: TodoState): TodoState => {
-      if (typeof window !== "undefined") {
-        const savedTodos = localStorage.getItem("todos");
-        return savedTodos ? { todos: JSON.parse(savedTodos) } : initialState;
-      }
-      return initialState;
+  const [state, dispatch] = useReducer(todoReducer, initialState, (initial) => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("todos");
+      return saved ? { todos: JSON.parse(saved) } : initial;
     }
-  );
+    return initial;
+  });
 
   useEffect(() => {
-    // Ensure that the code is running only in the browser
-    setIsClient(true);
-  }, []);
+    localStorage.setItem("todos", JSON.stringify(state.todos));
+  }, [state.todos]);
 
-  // Load tasks from localStorage once the component has mounted (client-side only)
-  useEffect(() => {
-    if (isClient && typeof window !== "undefined") {
-      const savedTodos = localStorage.getItem("todos");
-      if (savedTodos) {
-        dispatch({ type: "INITIALIZE_TASKS", payload: JSON.parse(savedTodos) });
-      }
-    }
-  }, [isClient]);
-
-  // Persist tasks to localStorage whenever tasks change (client-side only)
-  useEffect(() => {
-    if (isClient && typeof window !== "undefined") {
-      // Whenever the tasks array changes (add, delete, toggle), save to localStorage
-      localStorage.setItem("todos", JSON.stringify(state.todos));
-    }
-  }, [state.todos, isClient]);
-
-  // Render nothing initially on the server
-  if (!isClient) {
-    return null;
-  }
   return (
     <TodoContext.Provider value={{ state, dispatch }}>
       {children}
@@ -104,6 +59,4 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-export const useTodoContext = () => {
-  return useContext(TodoContext);
-};
+export const useTodoContext = () => useContext(TodoContext);

@@ -1,8 +1,10 @@
-import { Tab } from "../types/tabs.type";
 import { Tabs } from "../tabs";
 import { TodoList } from "../todoList";
 import { TaskForm } from "../taskForm";
+
 import { Toaster } from "react-hot-toast";
+
+import { Tab } from "../types/tabs.type";
 
 export const TodoContainer: React.FC = () => {
   const tabs: Tab[] = [

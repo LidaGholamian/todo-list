@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+
 import { TabsProps } from "./tabs.types";
 
 export const Tabs: React.FC<TabsProps> = ({ tabs }) => {

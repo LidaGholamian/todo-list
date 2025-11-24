@@ -1,19 +1,16 @@
-import { Todo } from "../_components/types/list.type";
+import { TodoProps } from "../_components/types/list.type";
 
 export interface TodoState {
-  todos: Todo[];
+  todos: TodoProps[];
 }
 
-export type TodoContextType= {
-    todos: Todo[];
-    addTodo: (text: string) => void;
-    toggleTodo: (id: number) => void;
-    deleteTodo: (id: number) => void;
-  }
+export type TodoContextType = {
+  state: TodoState;
+  dispatch: React.Dispatch<TodoAction>;
+};
 
-  export type TodoAction =
-  | { type: "ADD_TASK"; payload: { title: string; date: string } }
+export type TodoAction =
+  | { type: "ADD_TASK"; payload: { title: string; date?: string; favIcon?: boolean } }
   | { type: "DELETE_TASK"; payload: number }
   | { type: "TOGGLE_TASK"; payload: number }
-  | { type: "INITIALIZE_TASKS"; payload: Todo[] }
-  | { type: "REORDER_TASKS"; payload: Todo[] };
+  | { type: "INITIALIZE_TASKS"; payload: TodoProps[] }
