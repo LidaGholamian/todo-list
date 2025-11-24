@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Vazirmatn, Figtree } from "next/font/google";
-import localFont from "next/font/local";
 
 import { Footer } from "./_components/footer";
 import { Header } from "./_components/header";

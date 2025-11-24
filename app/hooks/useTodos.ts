@@ -14,8 +14,12 @@ export const useTodos = () => {
         if (!res.ok) throw new Error("Failed to fetch todos");
         const data: Todos[] = await res.json();
         setTodos(data);
-      } catch (err: any) {
-        setError(err.message || "Unknown error");
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Unknown error");
+        }
       } finally {
         setLoading(false);
       }
